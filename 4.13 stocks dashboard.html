@@ -48,6 +48,9 @@
         var stocksSelect = document.getElementById("my-stock-selector")
         var apiKeyInput = document.getElementById("my-api-key")
 
+        var displaySymbol = document.getElementById("display-stock-symbol")
+        var displayLatestClose = document.getElementById("display-latest-closing-price")
+
 
 
         button.addEventListener("click", makeDashboard)
@@ -67,11 +70,36 @@
                 .then(data => {
                     console.log("DATA", data) // this is the data you're looking for
 
-                    // GOAL 2: DISPLAY DATA ON THE PAGE
+                    // GOAL 2: PROCESS THE DATA
 
-                    console.log("TODO: DISPLAY DATA")
+                    var tsd = data["Time Series (Daily)"]
+                    var dates = Object.keys(tsd) //> ["2020-01-27", "2020-01-24", "2020-01-23", etc.]
+                    var allPrices = Object.values(tsd) // [{}, {}, {}]
+                    var closingPrices = allPrices.map(obj => obj["5. adjusted close"]) //> [100, 200, 300]
+                    var latestClose = closingPrices[0]
+                    console.log("DATES:", dates)
+                    console.log("CLOSING PRICES:", closingPrices)
+                    console.log("LATEST CLOSE:", latestClose)
 
-                    console.log("TODO: DATAVIZ")
+                    // DISPLAY DATA
+                    displaySymbol.innerText = symbol
+                    displayLatestClose.innerText = "$" + latestClose
+
+                    // VISUALIZE THE DATA
+                    // see: https://plotly.com/javascript/line-charts/
+                    var series = {
+                        x: dates,
+                        y: closingPrices,
+                        mode: "lines+markers"
+                    }
+                    var chartData = [series]
+                    var layout = {
+                        title: "Daily Closing Prices for Stock: " + symbol,
+                        height: 500
+                    }
+                    Plotly.newPlot("dataviz-container", chartData, layout, {responsive: true})
+
+
 
 
                 })
